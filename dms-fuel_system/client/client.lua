@@ -46,6 +46,10 @@ local function calculateFuelConsumptionAdvanced(vehicle)
 
   local upgradeMultiplier = engineMultiplier * gearboxMultiplier * turboMultiplier * suspensionMultiplier
   local massImpact = (speed < 50) and (mass / 6000) or (mass / 10000)
+
+  local engineHealth = GetVehicleEngineHealth(vehicle)
+  local damageMultiplier = 1.0 + ((1000.0 - engineHealth) / 1000.0) * 0.5
+
   local isMoving = speed > 5.0
   local finalUpgradeMultiplier = isMoving and upgradeMultiplier or 1.0
 
@@ -53,7 +57,7 @@ local function calculateFuelConsumptionAdvanced(vehicle)
       and ((speed * 0.015) + (rpm * 0.07) + massImpact + (driveForce * 0.8)) * 0.008
       or ((speed * 0.02) + (rpm * 0.08) + massImpact + (driveForce * 1.0)) * 0.01
 
-  return baseConsumption * consumptionRate * finalUpgradeMultiplier
+  return baseConsumption * consumptionRate * finalUpgradeMultiplier * damageMultiplier
 end
 
 -- Tank kapasitesi (model -> sınıf)
