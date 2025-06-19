@@ -88,7 +88,7 @@ Returns the current fuel level (in liters) of a vehicle by its network ID.
 ```lua
 local netID = VehToNet(GetVehiclePedIsIn(PlayerPedId(), false))
 local fuel = exports["dms-fuel_system"]:GetFuel(netID)
-print("Yakıt miktarı: ", fuel)
+print("Fuel level: ", fuel)
 ```
 
 #### `SetFuel(netID, amount)`
@@ -106,7 +106,7 @@ Returns the maximum fuel tank capacity for a given vehicle.
 ```lua
 local netID = VehToNet(GetVehiclePedIsIn(PlayerPedId(), false))
 local capacity = exports["dms-fuel_system"]:GetMaxFuelCapacity(netID)
-print("Depo kapasitesi: ", capacity)
+print("Tank capacity: ", capacity)
 ```
 ---
 
