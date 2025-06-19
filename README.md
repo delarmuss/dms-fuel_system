@@ -123,4 +123,4 @@ MIT — Free to use, modify, and distribute. Credit is appreciated but not requi
 ## 🤝 Contribute
 Issues and pull requests are welcome. Let’s improve this together!
 
-> Script by **Delarmuss** — [@YourGitHub](https://github.com/YourGitHub)
+> Script by **Delarmuss** — [@Delarmuss](https://github.com/delarmuss)
