@@ -4,16 +4,16 @@ Config.UseDrawText = true
 
 -- The recommended capacity value for trucks, buses, etc. is 120 consumption is 2.0
 Config.vehicleClass = {
-  [0] = { consumption = 1.0, tankCapacity = 40.0 },   -- Compact
+  [0] = { consumption = 1.0, tankCapacity = 35.0 },   -- Compact
   [1] = { consumption = 1.0, tankCapacity = 50.0 },   -- Sedan
-  [2] = { consumption = 1.1, tankCapacity = 70.0 },   -- SUV
-  [3] = { consumption = 1.3, tankCapacity = 50.0 },   -- Coupe
+  [2] = { consumption = 1.3, tankCapacity = 70.0 },   -- SUV
+  [3] = { consumption = 1.2, tankCapacity = 50.0 },   -- Coupe
   [4] = { consumption = 1.4, tankCapacity = 60.0 },   -- Muscle
   [5] = { consumption = 1.5, tankCapacity = 55.0 },   -- Sports Classic
   [6] = { consumption = 1.6, tankCapacity = 55.0 },   -- Sports
   [7] = { consumption = 1.8, tankCapacity = 45.0 },   -- Super
-  [8] = { consumption = 1.2, tankCapacity = 20.0 },   -- Motorcycle
-  [9] = { consumption = 1.3, tankCapacity = 75.0 },   -- Offroad
+  [8] = { consumption = 1.1, tankCapacity = 20.0 },   -- Motorcycle
+  [9] = { consumption = 1.5, tankCapacity = 75.0 },   -- Offroad
   [10] = { consumption = 2.5, tankCapacity = 120.0 }, -- Industrial
   [11] = { consumption = 2.2, tankCapacity = 70.0 },  -- Utility
   [12] = { consumption = 2.0, tankCapacity = 80.0 },  -- Vans
@@ -41,7 +41,7 @@ Config.vehicles = {
   [`ambulance`] = { consumption = 2.0, tankCapacity = 80.0 },
   [`firetruk`] = { consumption = 2.0, tankCapacity = 120.0 },
   [`pbus`] = { consumption = 2.0, tankCapacity = 120.0 },
-  [`policeb`] = { consumption = 1.2, tankCapacity = 30.0 },
+  [`policeb`] = { consumption = 1.1, tankCapacity = 30.0 },
   [`riot`] = { consumption = 2.0, tankCapacity = 120.0 },
   [`riot2`] = { consumption = 2.0, tankCapacity = 120.0 },
 }

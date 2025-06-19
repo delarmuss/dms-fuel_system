@@ -40,7 +40,7 @@ local function calculateFuelConsumptionAdvanced(vehicle)
   local turboOn = IsToggleModOn(vehicle, 18)
 
   local engineMultiplier = 1.0 + (engineRatio * 0.08)
-  local gearboxMultiplier = 1.0 + (gearboxRatio * 0.05)
+  local gearboxMultiplier = 1.0 + (gearboxRatio * 0.06)
   local turboMultiplier = turboOn and 1.1 or 1.0
   local suspensionMultiplier = 1.0 - (suspensionRatio * 0.04)
 
@@ -207,21 +207,21 @@ Citizen.CreateThread(function()
   end
 end)
 
--- Yakıt göstergesi
-local function drawText(x, y, text, scale, r, g, b, a)
-  SetTextFont(0)
-  SetTextProportional(1)
-  SetTextScale(scale, scale)
-  SetTextColour(r, g, b, a or 255)
-  SetTextEdge(1, 0, 0, 0, 255)
-  SetTextDropShadow()
-  SetTextOutline()
-  SetTextEntry("STRING")
-  AddTextComponentString(text)
-  DrawText(x, y)
-end
-
 if Config.UseDrawText then
+  -- Yakıt göstergesi
+  local function drawText(x, y, text, scale, r, g, b, a)
+    SetTextFont(0)
+    SetTextProportional(1)
+    SetTextScale(scale, scale)
+    SetTextColour(r, g, b, a or 255)
+    SetTextEdge(1, 0, 0, 0, 255)
+    SetTextDropShadow()
+    SetTextOutline()
+    SetTextEntry("STRING")
+    AddTextComponentString(text)
+    DrawText(x, y)
+  end
+
   Citizen.CreateThread(function()
     while true do
       Citizen.Wait(1)
