@@ -26,7 +26,7 @@ print("Yakıt miktarı: ", fuel)
 #### `SetFuel(netID, amount)`
 Aracın yakıt miktarını (litre) ayarlar. Depo kapasitesi aşılamaz.
 
-```
+```lua
 local amount = 100
 local netID = VehToNet(GetVehiclePedIsIn(PlayerPedId(), false))
 exports["dms-fuel_system"]:SetFuel(netID, amount)
@@ -102,7 +102,7 @@ print("Fuel level: ", fuel)
 #### `SetFuel(netID, amount)`
 Sets the fuel level (in liters) of the vehicle. It is clamped to the vehicle’s maximum capacity.
 
-```
+```lua
 local amount = 100
 local netID = VehToNet(GetVehiclePedIsIn(PlayerPedId(), false))
 exports["dms-fuel_system"]:SetFuel(netID, amount)
