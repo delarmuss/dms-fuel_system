@@ -71,6 +71,8 @@ print("Depo kapasitesi: ", capacity)
 - Yakıt türleri (benzin/dizel) ayrımı henüz yok
 - Kalıcılık (MySQL) eklentisi opsiyoneldir
 
+---
+
 ## 🔧 Entegrasyon İpuçları
 
 - HUD'u `GetFuel` ile bağlayarak gerçek zamanlı yakıt göstergesi oluşturabilirsiniz.
