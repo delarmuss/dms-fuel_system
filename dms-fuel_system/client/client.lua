@@ -95,7 +95,7 @@ end
 
 -- Export: Yakıt al
 function GetFuel(netID)
-  return vehicleFuelData[netID] or nil
+  return vehicleFuelData[netID]
 end
 
 -- Export: Yakıt ayarla

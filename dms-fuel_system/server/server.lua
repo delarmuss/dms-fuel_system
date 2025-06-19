@@ -2,6 +2,8 @@ local vehicleFuelData = {}
 
 RegisterNetEvent("vehicle:updateFuel")
 AddEventHandler("vehicle:updateFuel", function(netVehicleId, fuelAmount)
+  if not DoesEntityExist(netVehicleId) then return end
+
   vehicleFuelData[netVehicleId] = fuelAmount
 
   -- Tüm oyunculara güncel yakıt bilgisini yay
@@ -14,6 +16,6 @@ end)
 RegisterNetEvent("vehicle:requestFuel")
 AddEventHandler("vehicle:requestFuel", function(netVehicleId)
   local src = source
-  local fuel = vehicleFuelData[netVehicleId] or 100.0
+  local fuel = vehicleFuelData[netVehicleId] or Config.defaultTankCapacity
   TriggerClientEvent("vehicle:setFuel", src, netVehicleId, fuel)
 end)
