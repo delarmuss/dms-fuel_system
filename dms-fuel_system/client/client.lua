@@ -24,10 +24,10 @@ local function calculateFuelConsumptionAdvanced(vehicle)
   local mass = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fMass")
   local driveForce = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveForce")
   local electric = isElectricVehicle(vehicle)
-  local modelName = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle)):lower()
+  local modelHash = GetEntityModel(vehicle)
 
   -- Model bazlı varsa öncelikli al
-  local vehicleConfig = Config.vehicles[modelName]
+  local vehicleConfig = Config.vehicles[modelHash]
   local class = GetVehicleClass(vehicle)
   local classData = Config.vehicleClass[class] or { consumption = 1.0, tankCapacity = Config.defaultTankCapacity }
 
@@ -58,10 +58,9 @@ end
 
 -- Tank kapasitesi (model -> sınıf)
 local function getTankCapacity(vehicle)
-  local model = GetEntityModel(vehicle)
-  local modelName = GetDisplayNameFromVehicleModel(model):lower()
+  local modelHash = GetEntityModel(vehicle)
 
-  local vehicleConfig = Config.vehicles[modelName]
+  local vehicleConfig = Config.vehicles[modelHash]
   if vehicleConfig and vehicleConfig.tankCapacity then
     if vehicleConfig.tankCapacity == 0.0 then
       return 0.0
