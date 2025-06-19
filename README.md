@@ -50,10 +50,21 @@ print("Depo kapasitesi: ", capacity)
 | 🔁 Motor Devri (RPM)         | %20 - %30     | Yüksek devirde daha fazla tüketim |
 | 🧱 Araç Ağırlığı             | %5 - %10      | Ağır araçlar daha fazla tüketir |
 | 🛠️ Motor Modifikasyonu      | ~%8 artış     | Her mod seviyesi %2–3 artırır |
-| ⚙️ Vites Modifikasyonu      | ~%5 artış     | Performansa göre artış sağlar |
+| ⚙️ Vites Modifikasyonu      | ~%6 artış     | Performansa göre artış sağlar |
 | 💨 Turbo                     | %10 artış     | Turbo açıkken yakıt artar |
 | 🛞 Süspansiyon Modifikasyonu| %4’e kadar azalma | Sürtünme azaltılır |
 | ⚡ Elektrikli Araçlar        | ~%30 daha verimli | Ayrı formül ile hesaplanır |
+| 🔧 Motor Hasarı             | %0 – %50 artış | Hasar oranı arttıkça yakıt tüketimi artar |
+
+### 🧠 Motor Hasarına Göre Yakıt Tüketimi
+
+| Motor Sağlığı | Ekstra Yakıt Tüketimi |
+| ------------- | --------------------- |
+| 1000.0        | +%0 (normal seviye)   |
+| 750.0         | +%12.5                |
+| 500.0         | +%25                  |
+| 250.0         | +%37.5                |
+| 0.0           | +%50                  |
 
 ---
 
@@ -130,6 +141,17 @@ print("Tank capacity: ", capacity)
 | 💨 Turbo Enabled           | +10%           | Turbo causes extra consumption |
 | 🛞 Suspension Mods         | Up to -4%      | Can reduce consumption |
 | ⚡ Electric Vehicles        | ~30% more efficient | Uses separate formula |
+| 🔧 Engine Damage            | 0% – 50% increase    | More damage leads to higher consumption          |
+
+### 🧠 Fuel Consumption Based on Engine Health
+
+| Engine Health | Additional Fuel Consumption |
+| ------------- | --------------------------- |
+| 1000.0        | +0% (normal level)          |
+| 750.0         | +12.5%                      |
+| 500.0         | +25%                        |
+| 250.0         | +37.5%                      |
+| 0.0           | +50%                        |
 
 ---
 
