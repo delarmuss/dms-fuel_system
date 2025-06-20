@@ -122,6 +122,13 @@ RegisterNetEvent("vehicle:setFuel")
 AddEventHandler("vehicle:setFuel", function(uuid, fuelAmount)
   vehicleFuelData[uuid] = fuelAmount
   vehicleUpdateTime[uuid] = GetGameTimer()
+
+  -- Oyuncunun içindeki araç o UUID'ye aitse, yakıt seviyesini anında uygula
+  local ped = PlayerPedId()
+  local vehicle = GetVehiclePedIsIn(ped, false)
+  if vehicle and DoesEntityExist(vehicle) and getVehicleUUID(vehicle) == uuid then
+    SetVehicleFuelLevel(vehicle, fuelAmount)
+  end
 end)
 
 local function requestFuelForVehicle(uuid)
