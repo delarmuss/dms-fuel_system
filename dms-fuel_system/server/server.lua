@@ -1,21 +1,21 @@
 local vehicleFuelData = {}
 
-RegisterNetEvent("vehicle:updateFuel")
-AddEventHandler("vehicle:updateFuel", function(netVehicleId, fuelAmount)
-  if not DoesEntityExist(netVehicleId) then return end
+RegisterNetEvent("vehicle:updateFuel", function(uuid, fuelAmount)
+  if type(uuid) ~= "string" or type(fuelAmount) ~= "number" then return end
+  if fuelAmount < 0 or fuelAmount > 250 then return end
 
-  vehicleFuelData[netVehicleId] = fuelAmount
+  vehicleFuelData[uuid] = fuelAmount
 
-  -- Tüm oyunculara güncel yakıt bilgisini yay
-  TriggerClientEvent("vehicle:setFuel", -1, netVehicleId, fuelAmount)
+  -- Tüm oyunculara güncel yakıt bilgisini gönder
+  TriggerClientEvent("vehicle:setFuel", -1, uuid, fuelAmount)
 
-  -- Buraya MySQL güncellemesi istersen eklenebilir
+  -- İsteğe bağlı: Kalıcı veri tabanına yazmak istersen buraya ekleyebilirsin
 end)
 
--- İsteğe bağlı: Client yeni araca bindiğinde yakıtını isteyebilir
-RegisterNetEvent("vehicle:requestFuel")
-AddEventHandler("vehicle:requestFuel", function(netVehicleId)
+RegisterNetEvent("vehicle:requestFuel", function(uuid)
   local src = source
-  local fuel = vehicleFuelData[netVehicleId] or Config.defaultTankCapacity
-  TriggerClientEvent("vehicle:setFuel", src, netVehicleId, fuel)
+  if type(uuid) ~= "string" then return end
+
+  local fuel = vehicleFuelData[uuid] or Config.defaultTankCapacity
+  TriggerClientEvent("vehicle:setFuel", src, uuid, fuel)
 end)

@@ -1,6 +1,21 @@
 local vehicleFuelData = {}
 local vehicleUpdateTime = {}
 
+Citizen.CreateThread(function()
+  DecorRegister("unique_fuel_id", 3) -- 3 = INT
+end)
+
+function getVehicleUUID(vehicle)
+  if not DoesEntityExist(vehicle) then return nil end
+
+  if not DecorExistOn(vehicle, "unique_fuel_id") then
+    local id = math.random(1000000, 9999999)
+    DecorSetInt(vehicle, "unique_fuel_id", id)
+  end
+
+  return tostring(DecorGetInt(vehicle, "unique_fuel_id"))
+end
+
 -- Elektrikli araç kontrolü
 local function isElectricVehicle(vehicle)
   local model = GetEntityModel(vehicle)
@@ -26,14 +41,12 @@ local function calculateFuelConsumptionAdvanced(vehicle)
   local electric = isElectricVehicle(vehicle)
   local modelHash = GetEntityModel(vehicle)
 
-  -- Model bazlı varsa öncelikli al
   local vehicleConfig = Config.vehicles[modelHash]
   local class = GetVehicleClass(vehicle)
   local classData = Config.vehicleClass[class] or { consumption = 1.0, tankCapacity = Config.defaultTankCapacity }
 
   local consumptionRate = vehicleConfig and vehicleConfig.consumption or classData.consumption
 
-  -- Mod oranları vs (aynı kalabilir)
   local engineRatio = getModRatio(vehicle, 11)
   local gearboxRatio = getModRatio(vehicle, 13)
   local suspensionRatio = getModRatio(vehicle, 15)
@@ -60,32 +73,18 @@ local function calculateFuelConsumptionAdvanced(vehicle)
   return baseConsumption * consumptionRate * finalUpgradeMultiplier * damageMultiplier
 end
 
--- Tank kapasitesi (model -> sınıf)
 local function getTankCapacity(vehicle)
   local modelHash = GetEntityModel(vehicle)
-
   local vehicleConfig = Config.vehicles[modelHash]
   if vehicleConfig and vehicleConfig.tankCapacity then
-    if vehicleConfig.tankCapacity == 0.0 then
-      return 0.0
-    else
-      return vehicleConfig.tankCapacity
-    end
+    return vehicleConfig.tankCapacity
   end
-
   local class = GetVehicleClass(vehicle)
   local classData = Config.vehicleClass[class] or { tankCapacity = Config.defaultTankCapacity }
-
-  if classData.tankCapacity == 0.0 then
-    return 0.0
-  else
-    return classData.tankCapacity
-  end
+  return classData.tankCapacity
 end
 
--- Export: Maksimum kapasite
-function GetMaxFuelCapacity(netID)
-  local vehicle = NetToVeh(netID)
+function GetMaxFuelCapacity(vehicle)
   if DoesEntityExist(vehicle) then
     return getTankCapacity(vehicle)
   else
@@ -93,47 +92,42 @@ function GetMaxFuelCapacity(netID)
   end
 end
 
--- Export: Yakıt al
-function GetFuel(netID)
-  return vehicleFuelData[netID]
+function GetFuel(vehicle)
+  local uuid = getVehicleUUID(vehicle)
+  if not uuid then return nil end
+  return vehicleFuelData[uuid]
 end
 
--- Export: Yakıt ayarla
-function SetFuel(netID, amount)
-  local vehicle = NetToVeh(netID)
-  if DoesEntityExist(vehicle) then
-    local maxFuel = GetMaxFuelCapacity(netID)
-    local clampedAmount = math.min(math.max(amount, 0), maxFuel)
-    vehicleFuelData[netID] = clampedAmount
-    vehicleUpdateTime[netID] = GetGameTimer()
-    SetVehicleFuelLevel(vehicle, clampedAmount)
-    TriggerServerEvent("vehicle:updateFuel", netID, clampedAmount)
-  end
+function SetFuel(vehicle, amount)
+  if not DoesEntityExist(vehicle) then return end
+  local uuid = getVehicleUUID(vehicle)
+  if not uuid then return end
+
+  local maxFuel = GetMaxFuelCapacity(vehicle)
+  local clampedAmount = math.min(math.max(amount, 0), maxFuel)
+
+  vehicleFuelData[uuid] = clampedAmount
+  vehicleUpdateTime[uuid] = GetGameTimer()
+  SetVehicleFuelLevel(vehicle, clampedAmount)
+  TriggerServerEvent("vehicle:updateFuel", uuid, clampedAmount)
 end
 
--- Export'ları dışarıya aç
 Citizen.CreateThread(function()
   exports("GetFuel", GetFuel)
   exports("SetFuel", SetFuel)
   exports("GetMaxFuelCapacity", GetMaxFuelCapacity)
 end)
 
--- Server'dan yakıt al
 RegisterNetEvent("vehicle:setFuel")
-AddEventHandler("vehicle:setFuel", function(netVehicleId, fuelAmount)
-  local vehicle = NetToVeh(netVehicleId)
-  if DoesEntityExist(vehicle) then
-    SetVehicleFuelLevel(vehicle, fuelAmount)
-    vehicleFuelData[netVehicleId] = fuelAmount
-    vehicleUpdateTime[netVehicleId] = GetGameTimer()
-  end
+AddEventHandler("vehicle:setFuel", function(uuid, fuelAmount)
+  vehicleFuelData[uuid] = fuelAmount
+  vehicleUpdateTime[uuid] = GetGameTimer()
 end)
 
-local function requestFuelForVehicle(netID)
-  TriggerServerEvent("vehicle:requestFuel", netID)
+local function requestFuelForVehicle(uuid)
+  TriggerServerEvent("vehicle:requestFuel", uuid)
 end
 
--- Ana yakıt güncelleme döngüsü
 local lastServerUpdateTime = {}
 local lastServerFuelSent = {}
 
@@ -143,52 +137,40 @@ Citizen.CreateThread(function()
     local ped = PlayerPedId()
     if IsPedInAnyVehicle(ped, false) then
       local vehicle = GetVehiclePedIsIn(ped, false)
-      if vehicle and vehicle ~= 0 then
-        local netID = VehToNet(vehicle)
-        local maxFuel = GetMaxFuelCapacity(netID)
-        if maxFuel == 0.0 then
-          -- Bu araçta yakıt sistemi yok, işlem yapma
-          goto continueLoop
+      if vehicle and DoesEntityExist(vehicle) then
+        local uuid = getVehicleUUID(vehicle)
+        local maxFuel = GetMaxFuelCapacity(vehicle)
+        if maxFuel == 0.0 then goto continueLoop end
+
+        if not vehicleFuelData[uuid] then
+          requestFuelForVehicle(uuid)
         end
 
-        if vehicleFuelData[netID] == nil then
-          requestFuelForVehicle(netID)
-        end
-
-        local currentFuel = vehicleFuelData[netID] or maxFuel
-
-        if currentFuel <= 0 then
-          currentFuel = 0
-        end
+        local currentFuel = vehicleFuelData[uuid] or maxFuel
 
         if GetIsVehicleEngineRunning(vehicle) then
           local currentTime = GetGameTimer()
-          local lastTime = vehicleUpdateTime[netID] or currentTime
+          local lastTime = vehicleUpdateTime[uuid] or currentTime
           local deltaTime = (currentTime - lastTime) / 1000.0
           local consumption = calculateFuelConsumptionAdvanced(vehicle)
 
-          currentFuel = currentFuel - (consumption * deltaTime)
-          if currentFuel < 0 then currentFuel = 0 end
-          if currentFuel > maxFuel then currentFuel = maxFuel end
-
-          vehicleFuelData[netID] = currentFuel
-          vehicleUpdateTime[netID] = currentTime
-
+          currentFuel = math.max(0.0, math.min(currentFuel - (consumption * deltaTime), maxFuel))
+          vehicleFuelData[uuid] = currentFuel
+          vehicleUpdateTime[uuid] = currentTime
           SetVehicleFuelLevel(vehicle, currentFuel)
 
-          -- Event gönderme optimizasyonu
-          local lastSentTime = lastServerUpdateTime[netID] or 0
-          local lastFuelSent = lastServerFuelSent[netID] or currentFuel + 1 -- Fark olsun diye
+          local lastSentTime = lastServerUpdateTime[uuid] or 0
+          local lastFuelSent = lastServerFuelSent[uuid] or (currentFuel + 1)
           local timeSinceLastSend = (currentTime - lastSentTime) / 1000.0
           local fuelDifference = math.abs(currentFuel - lastFuelSent)
 
           if timeSinceLastSend >= 1.0 or fuelDifference >= 0.1 then
-            TriggerServerEvent("vehicle:updateFuel", netID, currentFuel)
-            lastServerUpdateTime[netID] = currentTime
-            lastServerFuelSent[netID] = currentFuel
+            TriggerServerEvent("vehicle:updateFuel", uuid, currentFuel)
+            lastServerUpdateTime[uuid] = currentTime
+            lastServerFuelSent[uuid] = currentFuel
           end
         else
-          vehicleUpdateTime[netID] = GetGameTimer()
+          vehicleUpdateTime[uuid] = GetGameTimer()
         end
         ::continueLoop::
       end
@@ -198,21 +180,7 @@ Citizen.CreateThread(function()
   end
 end)
 
-Citizen.CreateThread(function()
-  while true do
-    Citizen.Wait(30000) -- Her 30 saniyede bir kontrol
-
-    for netID, _ in pairs(vehicleFuelData) do
-      if not NetworkDoesNetworkIdExist(netID) then
-        vehicleFuelData[netID] = nil
-        vehicleUpdateTime[netID] = nil
-      end
-    end
-  end
-end)
-
 if Config.UseDrawText then
-  -- Yakıt göstergesi
   local function drawText(x, y, text, scale, r, g, b, a)
     SetTextFont(0)
     SetTextProportional(1)
@@ -232,11 +200,9 @@ if Config.UseDrawText then
       local ped = PlayerPedId()
       if IsPedInAnyVehicle(ped, false) then
         local vehicle = GetVehiclePedIsIn(ped, false)
-        local netID = VehToNet(vehicle)
-        local fuel = GetFuel(netID) or GetMaxFuelCapacity(netID)
-        local maxFuel = GetMaxFuelCapacity(netID)
+        local maxFuel = GetMaxFuelCapacity(vehicle)
         if maxFuel > 0.0 then
-          local fuel = GetFuel(netID) or maxFuel
+          local fuel = GetFuel(vehicle) or maxFuel
           drawText(0.015, 0.92, ("Fuel: %.1f / %.1f L"):format(fuel, maxFuel), 0.4, 255, 255, 255)
         end
       end
