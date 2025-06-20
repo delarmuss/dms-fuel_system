@@ -18,8 +18,7 @@ Bu script, FiveM sunucularında araçların gerçekçi şekilde yakıt tüketmes
 Aracın (network ID) güncel yakıt miktarını (litre) verir.
 
 ```lua
-local netID = VehToNet(GetVehiclePedIsIn(PlayerPedId(), false))
-local fuel = exports["dms-fuel_system"]:GetFuel(netID)
+local fuel = exports["dms-fuel_system"]:GetFuel(vehicle)
 print("Yakıt miktarı: ", fuel)
 ```
 
@@ -27,19 +26,18 @@ print("Yakıt miktarı: ", fuel)
 Aracın yakıt miktarını (litre) ayarlar. Depo kapasitesi aşılamaz.
 
 ```lua
-local amount = 100
-local netID = VehToNet(GetVehiclePedIsIn(PlayerPedId(), false))
-exports["dms-fuel_system"]:SetFuel(netID, amount)
+local amount = exports["dms-fuel_system"]:GetMaxFuelCapacity(vehicle)
+exports["dms-fuel_system"]:SetFuel(vehicle, amount)
 ```
 
 #### `GetMaxFuelCapacity(netID)`
 Aracın maksimum yakıt deposu kapasitesini döndürür.
 
 ```lua
-local netID = VehToNet(GetVehiclePedIsIn(PlayerPedId(), false))
-local capacity = exports["dms-fuel_system"]:GetMaxFuelCapacity(netID)
+local capacity = exports["dms-fuel_system"]:GetMaxFuelCapacity(vehicle)
 print("Depo kapasitesi: ", capacity)
 ```
+
 ---
 
 ### ⚙️ Yakıt Tüketimini Etkileyen Unsurlar
@@ -105,8 +103,7 @@ This script brings dynamic and realistic fuel consumption to your FiveM server. 
 Returns the current fuel level (in liters) of a vehicle by its network ID.
 
 ```lua
-local netID = VehToNet(GetVehiclePedIsIn(PlayerPedId(), false))
-local fuel = exports["dms-fuel_system"]:GetFuel(netID)
+local fuel = exports["dms-fuel_system"]:GetFuel(vehicle)
 print("Fuel level: ", fuel)
 ```
 
@@ -114,19 +111,18 @@ print("Fuel level: ", fuel)
 Sets the fuel level (in liters) of the vehicle. It is clamped to the vehicle’s maximum capacity.
 
 ```lua
-local amount = 100
-local netID = VehToNet(GetVehiclePedIsIn(PlayerPedId(), false))
-exports["dms-fuel_system"]:SetFuel(netID, amount)
+local amount = exports["dms-fuel_system"]:GetMaxFuelCapacity(vehicle)
+exports["dms-fuel_system"]:SetFuel(vehicle, amount)
 ```
 
 #### `GetMaxFuelCapacity(netID)`
 Returns the maximum fuel tank capacity for a given vehicle.
 
 ```lua
-local netID = VehToNet(GetVehiclePedIsIn(PlayerPedId(), false))
-local capacity = exports["dms-fuel_system"]:GetMaxFuelCapacity(netID)
+local capacity = exports["dms-fuel_system"]:GetMaxFuelCapacity(vehicle)
 print("Tank capacity: ", capacity)
 ```
+
 ---
 
 ### ⚙️ Factors That Affect Fuel Consumption
